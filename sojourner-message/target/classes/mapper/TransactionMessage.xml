@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.sojourner.message.dao.impl.TransactionMessageDaoImpl">
+
+	
+	<sql id="table_name"> transaction_message </sql>
+
+	<resultMap id="BaseResultMap" type="org.sojourner.message.entity.TransactionMessage">
+		<id column="id" property="id" jdbcType="int" />
+		<result column="version" property="version" jdbcType="SMALLINT" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="editor" property="editor" jdbcType="VARCHAR" />
+		<result column="creater" property="creater" jdbcType="VARCHAR" />
+		<result column="edit_time" property="editTime" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="message_id" property="messageId" jdbcType="VARCHAR" />
+		<result column="message_body" property="messageBody" jdbcType="VARCHAR" />
+		<result column="message_data_type" property="messageDataType" jdbcType="VARCHAR" />
+		<result column="consumer_queue" property="consumerQueue" jdbcType="VARCHAR" />
+		<result column="message_send_times" property="messageSendTimes" jdbcType="SMALLINT" />
+		<result column="areadly_dead" property="areadlyDead" jdbcType="VARCHAR" />
+		<result column="field1" property="field1" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, version, create_time, editor, creater, edit_time, status,remark,
+		message_id,message_body,message_data_type,consumer_queue,message_send_times,areadly_dead,
+		field1
+
+	</sql>
+
+	<insert id="insert" parameterType="org.sojourner.message.entity.TransactionMessage">
+		insert into
+		<include refid="table_name" />
+		(id, version, create_time,
+		editor, creater, edit_time,
+		status,remark,message_id,
+		message_body,message_data_type,
+		consumer_queue,message_send_times,areadly_dead,
+		field1
+		)
+		values (#{id}, 0, #{createTime},
+		#{editor}, #{creater}, #{editTime},
+		#{status},#{remark},#{messageId},
+		#{messageBody},#{messageDataType},
+		#{consumerQueue},#{messageSendTimes},#{areadlyDead},
+		#{field1}
+		)
+	</insert>
+
+	<update id="updateByPrimaryKey" parameterType="org.sojourner.message.entity.TransactionMessage">
+		update
+		<include refid="table_name" />
+		set version = #{version}+1,
+		create_time = #{createTime},
+		editor = #{editor},
+		creater = #{creater},
+		edit_time = #{editTime},
+		status = #{status},
+		remark = #{remark},
+		message_id = #{messageId},
+		message_body = #{messageBody},
+		message_data_type = #{messageDataType},
+		consumer_queue = #{consumerQueue},
+		message_send_times = #{messageSendTimes},
+		areadly_dead = #{areadlyDead},
+		field1 = #{field1},
+		where id = #{id} and
+		version = #{version}
+	</update>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="table_name" />
+		where id = #{id}
+	</select>
+
+	<select id="listBy" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="table_name" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		
+	</select>
+
+	<delete id="batchDeleteByColumn" parameterType="string">
+		delete from
+		<include refid="table_name" />
+		where message_id = #{messageId}
+	</delete>
+
+	<sql id="condition_sql">
+		<if test="messageId != null and messageId != ''"> and message_id = #{messageId}</if>
+		<if test="status != null and status != ''"> and status = #{status}</if>
+		<if test="areadlyDead != null and areadlyDead != ''"> and areadly_dead = #{areadlyDead}</if>
+		<if test="consumerQueue != null and consumerQueue != ''"> and consumer_queue = #{consumerQueue}</if>
+		<if test="createTimeBefore != null and createTimeBefore != ''">  <![CDATA[ and create_time < #{createTimeBefore}]]></if>
+	</sql>
+
+	<select id="listPage" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from <include refid="table_name" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<![CDATA[ order by create_time ]]>
+		<if test="listPageSortType == 'ASC'"> asc </if>
+		<if test="listPageSortType != 'ASC'"> desc </if>
+		<![CDATA[ limit #{pageFirst}, #{pageSize}]]>
+	</select>
+
+	<select id="listPageCount" parameterType="java.util.Map" resultType="long">
+		select count(1) from <include refid="table_name" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+	</select>
+	
+	<!-- 
+	<select id="listByPage" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select <include refid="Base_Column_List" /> from <include refid="table_name" />
+		<where>
+			<include refid="condition_sql" />
+		</where>
+		<![CDATA[ order by edit_time asc limit #{pageFirst}, #{pageSize}]]>
+	</select>
+	-->
+
+
+</mapper>

@@ -1,0 +1,6 @@
+org\sojourner\message\core\exception\BizException.class
+org\sojourner\message\core\page\PageParam.class
+org\sojourner\message\core\dao\impl\BaseDaoImpl.class
+org\sojourner\message\core\entity\BaseEntity.class
+org\sojourner\message\core\dao\BaseDao.class
+org\sojourner\message\core\page\PageBean.class
